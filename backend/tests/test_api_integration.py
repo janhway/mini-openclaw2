@@ -96,3 +96,31 @@ def test_chat_stream_sse(monkeypatch: pytest.MonkeyPatch, client: TestClient) ->
     assert "event: thought" in body
     assert "event: tool_call" in body
     assert "event: final" in body
+
+
+def test_chat_weather_putian(monkeypatch: pytest.MonkeyPatch, client: TestClient) -> None:
+    from backend import app as backend_app
+
+    async def fake_stream_chat(message: str, session_id: str):
+        assert message == "今天莆田的天气如何"
+        assert session_id == "weather-it"
+        yield {"type": "thought", "content": "识别到天气查询，准备读取天气技能。"}
+        yield {"type": "tool_call", "name": "read_file", "input": {"path": "skills/get_weather/SKILL.md"}}
+        yield {
+            "type": "final",
+            "content": "莆田今天天气：多云，当前气温 26°C，体感 27°C，未来 24 小时有短时小雨。",
+        }
+
+    monkeypatch.setattr(backend_app.agent_service, "stream_chat", fake_stream_chat)
+
+    response = client.post(
+        "/api/chat",
+        json={"message": "今天莆田的天气如何", "session_id": "weather-it", "stream": False},
+    )
+    assert response.status_code == 200
+
+    events = response.json()["events"]
+    final_event = next(event for event in events if event["type"] == "final")
+    assert "莆田" in final_event["content"]
+    assert "天气" in final_event["content"]
+    assert "气温" in final_event["content"]
