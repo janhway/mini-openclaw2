@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from typing import Any, AsyncIterator
 
 from langchain.agents import create_agent
@@ -30,14 +31,27 @@ class AgentService:
         self.session_service = session_service
         self.tools = tools
 
+    def _resolve_runtime_model(self) -> tuple[str, str | None]:
+        configured = self.model_settings.model
+        tool_model_override = os.getenv("OPENAI_TOOL_MODEL", "").strip()
+        if tool_model_override:
+            return tool_model_override, configured
+
+        base = (self.model_settings.base_url or "").lower()
+        if "deepseek.com" in base and configured == "deepseek-reasoner":
+            return "deepseek-chat", configured
+
+        return configured, None
+
     def _build_agent(self, system_prompt: str):
+        runtime_model, _ = self._resolve_runtime_model()
         model = ChatOpenAI(
-            model=self.model_settings.model,
+            model=runtime_model,
             api_key=self.model_settings.api_key,
             base_url=self.model_settings.base_url or None,
             temperature=0,
         )
-        return create_agent(model=model, tools=self.tools, system_prompt=system_prompt)
+        return create_agent(model=model, tools=self.tools, system_prompt=system_prompt), runtime_model
 
     def _extract_chunk_text(self, chunk: Any) -> str:
         if chunk is None:
@@ -123,7 +137,7 @@ class AgentService:
         self.skill_service.refresh_snapshot()
         system_prompt = self.prompt_service.build_system_prompt()
         history = self.session_service.to_chat_messages(session)
-        agent = self._build_agent(system_prompt)
+        agent, runtime_model = self._build_agent(system_prompt)
 
         pending_entries: list[SessionEntry] = [SessionEntry(type="user", content=message)]
         tool_call_cache: dict[str, dict[str, Any]] = {}
@@ -131,6 +145,11 @@ class AgentService:
         final_emitted = False
 
         yield {"type": "thought", "content": "已加载技能快照与系统提示，开始执行。"}
+        if runtime_model != self.model_settings.model:
+            yield {
+                "type": "thought",
+                "content": f"检测到当前模型与工具链兼容性问题，已自动切换为 {runtime_model} 执行。",
+            }
 
         try:
             async for event in agent.astream_events(
