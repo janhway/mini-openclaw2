@@ -1,0 +1,5 @@
+__pycache__/
+.venv
+mini-openclaw/backend/sessions/
+mini-openclaw/frontend/node_modules/
+mini-openclaw/frontend/.next/
