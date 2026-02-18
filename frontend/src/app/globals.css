@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #fafafa;
+  --text: #122033;
+  --accent-blue: #1646d9;
+  --accent-blue-strong: #0f36ac;
+  --accent-orange: #ff6b1a;
+  --accent-orange-strong: #d84f05;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: radial-gradient(circle at 15% -20%, rgba(22, 70, 217, 0.18) 0%, rgba(22, 70, 217, 0) 44%),
+    radial-gradient(circle at 85% 10%, rgba(255, 107, 26, 0.2) 0%, rgba(255, 107, 26, 0) 42%),
+    var(--bg);
+  color: var(--text);
+  font-family: "Space Grotesk", sans-serif;
+}
+
+code,
+pre,
+kbd {
+  font-family: "IBM Plex Mono", monospace;
+}
