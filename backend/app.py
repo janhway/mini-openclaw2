@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from fastapi import FastAPI, HTTPException, Query
@@ -42,7 +43,15 @@ agent_service = AgentService(
     tools=core_tools,
 )
 
-app = FastAPI(title="mini-openclaw-backend", version="0.1.0")
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    skill_service.refresh_snapshot()
+    knowledge_service.initialize()
+    logger.info("Backend initialized. root_dir=%s", config.root_dir)
+    yield
+
+
+app = FastAPI(title="mini-openclaw-backend", version="0.1.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -56,13 +65,6 @@ def _sse(payload: dict) -> str:
     event_name = str(payload.get("type", "message"))
     data = json.dumps(payload, ensure_ascii=False)
     return f"event: {event_name}\ndata: {data}\n\n"
-
-
-@app.on_event("startup")
-async def on_startup() -> None:
-    skill_service.refresh_snapshot()
-    knowledge_service.initialize()
-    logger.info("Backend initialized. root_dir=%s", config.root_dir)
 
 
 @app.get("/api/health")
