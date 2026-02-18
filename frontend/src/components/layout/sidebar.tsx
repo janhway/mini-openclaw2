@@ -1,4 +1,4 @@
-import { MessageSquare, Brain, Library, RefreshCcw, Plus } from "lucide-react";
+import { MessageSquare, Library, RefreshCcw, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
@@ -7,8 +7,8 @@ import { SessionSummary } from "@/types";
 interface SidebarProps {
   sessions: SessionSummary[];
   activeSessionId: string;
-  activeTab: "chat" | "memory" | "skills";
-  onTabChange: (tab: "chat" | "memory" | "skills") => void;
+  activeTab: "memory" | "skills" | null;
+  onTabChange: (tab: "memory" | "skills") => void;
   onSelectSession: (id: string) => void;
   onCreateSession: () => void;
   onReloadSessions: () => void;
@@ -31,14 +31,6 @@ export function Sidebar({
           <span className="text-sm font-semibold">工作台</span>
         </div>
         <div className="space-y-1 text-xs text-slate-600">
-          <button
-            onClick={() => onTabChange("chat")}
-            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors ${
-              activeTab === "chat" ? "bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]" : "hover:bg-white/60"
-            }`}
-          >
-            <Brain className="h-3.5 w-3.5" /> 对话
-          </button>
           <button
             onClick={() => onTabChange("memory")}
             className={`flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors ${

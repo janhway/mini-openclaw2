@@ -83,7 +83,7 @@ export default function Home() {
   const fileEditor = useFileEditor(DEFAULT_EDITOR_PATH);
 
   const [activeSessionId, setActiveSessionId] = useState("default");
-  const [activeTab, setActiveTab] = useState<"chat" | "memory" | "skills">("chat");
+  const [activeTab, setActiveTab] = useState<"memory" | "skills" | null>(null);
   const [input, setInput] = useState("");
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [skillPaths, setSkillPaths] = useState<string[]>([]);
@@ -181,7 +181,7 @@ export default function Home() {
     await reloadSessions();
   };
 
-  const handleTabChange = async (tab: "chat" | "memory" | "skills") => {
+  const handleTabChange = async (tab: "memory" | "skills") => {
     setActiveTab(tab);
     if (tab === "memory") {
       await fileEditor.load("memory/MEMORY.md");
@@ -197,7 +197,7 @@ export default function Home() {
     const sessionId = `session-${new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14)}`;
     await createSession(sessionId);
     setActiveSessionId(sessionId);
-    setActiveTab("chat");
+    setActiveTab(null);
     setTimeline([]);
     setInput("");
     await reloadSessions();
@@ -223,7 +223,7 @@ export default function Home() {
             }}
             onSelectSession={(sessionId) => {
               setActiveSessionId(sessionId);
-              setActiveTab("chat");
+              setActiveTab(null);
               void loadSessionToTimeline(sessionId);
             }}
           />
