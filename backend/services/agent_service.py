@@ -97,7 +97,15 @@ class AgentService:
         return ""
 
     def _shorten(self, value: Any, max_chars: int = 2_000) -> str:
-        raw = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+        if value is None:
+            raw = ""
+        elif isinstance(value, str):
+            raw = value
+        else:
+            try:
+                raw = json.dumps(value, ensure_ascii=False, default=str)
+            except Exception:
+                raw = str(value)
         if len(raw) <= max_chars:
             return raw
         return f"{raw[: max_chars - 14]}...[truncated]"
