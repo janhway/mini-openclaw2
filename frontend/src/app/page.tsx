@@ -6,7 +6,7 @@ import { Inspector } from "@/components/layout/inspector";
 import { Navbar } from "@/components/layout/navbar";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Stage } from "@/components/layout/stage";
-import { readFile, getSession } from "@/lib/api";
+import { createSession, getSession, readFile } from "@/lib/api";
 import { useChatStream } from "@/features/chat/use-chat-stream";
 import { useFileEditor } from "@/features/files/use-file-editor";
 import { useSessions } from "@/features/sessions/use-sessions";
@@ -83,6 +83,7 @@ export default function Home() {
   const fileEditor = useFileEditor(DEFAULT_EDITOR_PATH);
 
   const [activeSessionId, setActiveSessionId] = useState("default");
+  const [activeTab, setActiveTab] = useState<"chat" | "memory" | "skills">("chat");
   const [input, setInput] = useState("");
   const [timeline, setTimeline] = useState<TimelineItem[]>([]);
   const [skillPaths, setSkillPaths] = useState<string[]>([]);
@@ -180,6 +181,28 @@ export default function Home() {
     await reloadSessions();
   };
 
+  const handleTabChange = async (tab: "chat" | "memory" | "skills") => {
+    setActiveTab(tab);
+    if (tab === "memory") {
+      await fileEditor.load("memory/MEMORY.md");
+      return;
+    }
+    if (tab === "skills") {
+      const firstSkill = skillPaths[0] ?? "workspace/SKILLS_SNAPSHOT.md";
+      await fileEditor.load(firstSkill);
+    }
+  };
+
+  const handleCreateSession = async () => {
+    const sessionId = `session-${new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14)}`;
+    await createSession(sessionId);
+    setActiveSessionId(sessionId);
+    setActiveTab("chat");
+    setTimeline([]);
+    setInput("");
+    await reloadSessions();
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -188,11 +211,19 @@ export default function Home() {
           <Sidebar
             sessions={sessions}
             activeSessionId={activeSessionId}
+            activeTab={activeTab}
+            onTabChange={(tab) => {
+              void handleTabChange(tab);
+            }}
             onReloadSessions={() => {
               void reloadSessions();
             }}
+            onCreateSession={() => {
+              void handleCreateSession();
+            }}
             onSelectSession={(sessionId) => {
               setActiveSessionId(sessionId);
+              setActiveTab("chat");
               void loadSessionToTimeline(sessionId);
             }}
           />

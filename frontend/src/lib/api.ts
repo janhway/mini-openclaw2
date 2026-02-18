@@ -44,6 +44,10 @@ export async function saveFile(path: string, content: string): Promise<void> {
   }
 }
 
+export async function createSession(sessionId: string): Promise<void> {
+  await saveFile(`sessions/${sessionId}.json`, "[]");
+}
+
 export async function streamChat(
   message: string,
   sessionId: string,

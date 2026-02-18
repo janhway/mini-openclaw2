@@ -1,4 +1,4 @@
-import { MessageSquare, Brain, Library, RefreshCcw } from "lucide-react";
+import { MessageSquare, Brain, Library, RefreshCcw, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Panel } from "@/components/ui/panel";
@@ -7,11 +7,22 @@ import { SessionSummary } from "@/types";
 interface SidebarProps {
   sessions: SessionSummary[];
   activeSessionId: string;
+  activeTab: "chat" | "memory" | "skills";
+  onTabChange: (tab: "chat" | "memory" | "skills") => void;
   onSelectSession: (id: string) => void;
+  onCreateSession: () => void;
   onReloadSessions: () => void;
 }
 
-export function Sidebar({ sessions, activeSessionId, onSelectSession, onReloadSessions }: SidebarProps) {
+export function Sidebar({
+  sessions,
+  activeSessionId,
+  activeTab,
+  onTabChange,
+  onSelectSession,
+  onCreateSession,
+  onReloadSessions,
+}: SidebarProps) {
   return (
     <Panel className="flex h-full flex-col p-4">
       <div className="mb-4 space-y-2">
@@ -20,16 +31,43 @@ export function Sidebar({ sessions, activeSessionId, onSelectSession, onReloadSe
           <span className="text-sm font-semibold">工作台</span>
         </div>
         <div className="space-y-1 text-xs text-slate-600">
-          <div className="flex items-center gap-2"><Brain className="h-3.5 w-3.5" /> 对话</div>
-          <div className="flex items-center gap-2"><Library className="h-3.5 w-3.5" /> 记忆 / 技能</div>
+          <button
+            onClick={() => onTabChange("chat")}
+            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors ${
+              activeTab === "chat" ? "bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]" : "hover:bg-white/60"
+            }`}
+          >
+            <Brain className="h-3.5 w-3.5" /> 对话
+          </button>
+          <button
+            onClick={() => onTabChange("memory")}
+            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors ${
+              activeTab === "memory" ? "bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]" : "hover:bg-white/60"
+            }`}
+          >
+            <Library className="h-3.5 w-3.5" /> 记忆
+          </button>
+          <button
+            onClick={() => onTabChange("skills")}
+            className={`flex w-full items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors ${
+              activeTab === "skills" ? "bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]" : "hover:bg-white/60"
+            }`}
+          >
+            <Library className="h-3.5 w-3.5" /> 技能
+          </button>
         </div>
       </div>
 
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-slate-800">会话列表</h2>
-        <Button variant="ghost" className="h-8 w-8 p-0" onClick={onReloadSessions}>
-          <RefreshCcw className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" className="h-8 w-8 p-0" onClick={onCreateSession} title="新建会话">
+            <Plus className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" className="h-8 w-8 p-0" onClick={onReloadSessions} title="刷新会话">
+            <RefreshCcw className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <div className="flex-1 space-y-2 overflow-y-auto">
