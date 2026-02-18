@@ -26,10 +26,10 @@ export function Inspector({
   return (
     <Panel className="flex h-full flex-col p-4">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-slate-800">Inspector</h2>
+        <h2 className="text-sm font-semibold text-slate-800">文件编辑器</h2>
         <Button onClick={onSave} disabled={saving} className="gap-1.5">
           <Save className="h-4 w-4" />
-          {saving ? "Saving..." : "Save"}
+          {saving ? "保存中..." : "保存"}
         </Button>
       </div>
 

@@ -38,7 +38,7 @@ export async function streamSse(
   onEvent: (event: ChatEvent) => void,
 ): Promise<void> {
   if (!response.body) {
-    throw new Error("SSE response body is empty");
+    throw new Error("SSE 响应体为空");
   }
 
   const reader = response.body.getReader();

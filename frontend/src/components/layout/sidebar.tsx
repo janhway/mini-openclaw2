@@ -17,16 +17,16 @@ export function Sidebar({ sessions, activeSessionId, onSelectSession, onReloadSe
       <div className="mb-4 space-y-2">
         <div className="flex items-center gap-2 text-slate-800">
           <MessageSquare className="h-4 w-4" />
-          <span className="text-sm font-semibold">Workspace</span>
+          <span className="text-sm font-semibold">工作台</span>
         </div>
         <div className="space-y-1 text-xs text-slate-600">
-          <div className="flex items-center gap-2"><Brain className="h-3.5 w-3.5" /> Chat</div>
-          <div className="flex items-center gap-2"><Library className="h-3.5 w-3.5" /> Memory / Skills</div>
+          <div className="flex items-center gap-2"><Brain className="h-3.5 w-3.5" /> 对话</div>
+          <div className="flex items-center gap-2"><Library className="h-3.5 w-3.5" /> 记忆 / 技能</div>
         </div>
       </div>
 
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-slate-800">Sessions</h2>
+        <h2 className="text-sm font-semibold text-slate-800">会话列表</h2>
         <Button variant="ghost" className="h-8 w-8 p-0" onClick={onReloadSessions}>
           <RefreshCcw className="h-4 w-4" />
         </Button>

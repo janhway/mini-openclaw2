@@ -4,7 +4,7 @@ export function Navbar() {
       <div className="mx-auto flex h-14 max-w-[1680px] items-center justify-between px-4 md:px-6">
         <div className="text-sm uppercase tracking-[0.18em] text-slate-500">mini OpenClaw</div>
         <div className="rounded-full bg-[var(--accent-orange)]/15 px-3 py-1 text-xs font-semibold text-[var(--accent-orange-strong)]">
-          Local Transparent Agent
+          本地透明智能体
         </div>
       </div>
     </header>

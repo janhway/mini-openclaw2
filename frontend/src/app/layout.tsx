@@ -9,8 +9,8 @@ import "@fontsource/space-grotesk/700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "mini OpenClaw IDE",
-  description: "Local transparent AI agent workspace",
+  title: "mini OpenClaw 工作台",
+  description: "本地透明智能体工作台",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
