@@ -61,6 +61,23 @@ function parseSkillPaths(snapshotContent: string): string[] {
   return matches.map((match) => match[1]).filter(Boolean);
 }
 
+function appendEventToTimeline(current: TimelineItem[], event: ChatEvent): TimelineItem[] {
+  if (event.type === "thought") {
+    const rawChunk = event.content ?? "";
+    if (!rawChunk.trim()) {
+      return current;
+    }
+
+    const last = current[current.length - 1];
+    if (last?.kind === "thought") {
+      const merged = `${last.content ?? ""}${rawChunk}`;
+      return [...current.slice(0, -1), { ...last, content: merged }];
+    }
+  }
+
+  return [...current, eventToTimelineItem(event)];
+}
+
 export default function Home() {
   const { sessions, reloadSessions } = useSessions();
   const fileEditor = useFileEditor(DEFAULT_EDITOR_PATH);
@@ -71,7 +88,7 @@ export default function Home() {
   const [skillPaths, setSkillPaths] = useState<string[]>([]);
 
   const onChatEvent = (event: ChatEvent) => {
-    setTimeline((current) => [...current, eventToTimelineItem(event)]);
+    setTimeline((current) => appendEventToTimeline(current, event));
   };
 
   const { sending, sendMessage } = useChatStream(onChatEvent);

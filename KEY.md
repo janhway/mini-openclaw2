@@ -13,7 +13,7 @@
 
 base_url="https://api.deepseek.com/v1" 
 api_key="sk-834781550a474e4cab42804ce1d36915"
-model="deepseek-reasoner"
+model="deepseek-chat"
 
 ## 1.2 qwen
 
