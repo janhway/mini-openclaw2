@@ -91,24 +91,51 @@ class AgentService:
         if isinstance(output, dict):
             messages = output.get("messages")
             if isinstance(messages, list) and messages:
-                last = messages[-1]
-                content = getattr(last, "content", "")
-                if isinstance(content, str):
-                    return content
-                if isinstance(content, list):
-                    texts = []
-                    for block in content:
-                        if isinstance(block, str):
-                            texts.append(block)
-                        elif isinstance(block, dict) and isinstance(block.get("text"), str):
-                            texts.append(block["text"])
-                    return "".join(texts)
+                for message in reversed(messages):
+                    if not self._is_assistant_message(message):
+                        continue
+                    if self._has_tool_calls(message):
+                        continue
+                    content = self._message_content(message).strip()
+                    if content:
+                        return content
 
             output_text = output.get("output") or output.get("output_text")
             if isinstance(output_text, str):
                 return output_text
 
         return ""
+
+    def _is_assistant_message(self, message: Any) -> bool:
+        if isinstance(message, dict):
+            message_type = str(message.get("type") or message.get("role") or "").lower()
+            return message_type in {"ai", "assistant"}
+        message_type = str(getattr(message, "type", "")).lower()
+        return message_type in {"ai", "assistant"}
+
+    def _has_tool_calls(self, message: Any) -> bool:
+        if isinstance(message, dict):
+            tool_calls = message.get("tool_calls")
+            return isinstance(tool_calls, list) and len(tool_calls) > 0
+        tool_calls = getattr(message, "tool_calls", None)
+        return isinstance(tool_calls, list) and len(tool_calls) > 0
+
+    def _message_content(self, message: Any) -> str:
+        if isinstance(message, dict):
+            content = message.get("content", "")
+        else:
+            content = getattr(message, "content", "")
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts: list[str] = []
+            for block in content:
+                if isinstance(block, str):
+                    parts.append(block)
+                elif isinstance(block, dict) and isinstance(block.get("text"), str):
+                    parts.append(block["text"])
+            return "".join(parts)
+        return str(content)
 
     def _shorten(self, value: Any, max_chars: int = 2_000) -> str:
         if value is None:
